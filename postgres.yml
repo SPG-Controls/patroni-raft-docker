@@ -1,0 +1,37 @@
+bootstrap:
+  dcs:
+    # Leader election settings
+    ttl: 30                          # Time before failover
+    loop_wait: 10                    # Time between voting?
+    retry_timeout: 10                # Time before retrying DCS / Postgres
+    maximum_lag_on_failover: 1048576 # Maximum bytes a follower may lag to be able to participate in leader election
+    # Replication settings
+    synchronous_mode: true           # Turn on synchronous replication
+    synchronous_mode_strict: true    # Reject writes when there is no synchronous replica
+    synchronous_node_count: 1        # Synchronous commit to 1 other node, async to other
+    # Postgres settings
+    postgresql:
+      use_pg_rewind: true            # Catch up node automatically when am old master comes back online
+
+  initdb:
+  - encoding: UTF8
+  - data-checksums
+
+  # Postgres inbound connection rules
+  pg_hba:
+  - host replication replicator 0.0.0.0/0 md5
+  - host all all 0.0.0.0/0 md5
+
+  # Some additional users users which needs to be created after initializing new cluster
+  # users:
+  #   admin:
+  #     password: admin
+  #     options:
+  #       - createrole
+  #       - createdb
+
+tags:
+  nofailover: false
+  noloadbalance: false
+  clonefrom: false
+  nosync: false

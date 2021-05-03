@@ -1,0 +1,64 @@
+version: "3.8"
+
+configs:
+  haproxy.cfg:
+    file: haproxy.cfg
+  # postgres.yml:
+  #   file: postgres.yml
+  # entrypoint.sh:
+  #   file: entrypoint.sh
+
+# volumes:
+#   dbdata1:
+#     driver: local
+#   dbdata2:
+#     driver: local
+#   dbdata3:
+#     driver: local
+
+services:
+  postgres:
+    image: haproxy
+    configs:
+    - source: haproxy.cfg
+      target: /usr/local/etc/haproxy/haproxy.cfg
+    ports:
+    - "5000:5000" # Postgres
+    - "7000:7000" # HAProxy stats
+
+  postgres1:
+    image: patroni-raft:local
+    hostname: postgres1
+    environment:
+      PATRONI_RAFT_PARTNER_ADDRS: "'postgres2:2222','postgres3:2222'"
+    # configs: &configs
+    # - source: postgres.yml
+    #   target: /app/postgres.yml
+    # - source: entrypoint.sh
+    #   target: /app/entrypoint.sh
+    # volumes:
+    # - type: volume
+    #   source: dbdata1
+    #   target: /app/data
+
+  postgres2:
+    image: patroni-raft:local
+    hostname: postgres2
+    environment:
+      PATRONI_RAFT_PARTNER_ADDRS: "'postgres1:2222','postgres3:2222'"
+    # configs: *configs
+    # volumes:
+    # - type: volume
+    #   source: dbdata2
+    #   target: /app/data
+
+  postgres3:
+    image: patroni-raft:local
+    hostname: postgres3
+    environment:
+      PATRONI_RAFT_PARTNER_ADDRS: "'postgres1:2222','postgres2:2222'"
+    # configs: *configs
+    # volumes:
+    # - type: volume
+    #   source: dbdata3
+    #   target: /app/data
