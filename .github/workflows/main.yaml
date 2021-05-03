@@ -29,7 +29,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: spgcontrols/patroni-raft:latest
+          tags: spgcontrols/postgresql-patroni-raft:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
