@@ -2,7 +2,7 @@ name: Docker CI
 
 on:
   push:
-    tags: '*'
+    branches: [main]
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: spgcontrols/postgresql-patroni-raft:latest
+          tags: spgcontrols/postgresql-patroni-raft:${{ github.event.release.tag_name }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
