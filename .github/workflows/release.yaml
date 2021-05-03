@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
       - name: Check Out Repo 
         uses: actions/checkout@v2
 
@@ -29,7 +33,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: spgcontrols/postgresql-patroni-raft:${GITHUB_REF##*/}
+          tags: spgcontrols/postgresql-patroni-raft:${{ steps.date.outputs.VERSION }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
