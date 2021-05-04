@@ -1,5 +1,6 @@
 version: "3.8"
 
+# Uncomment configs if you want to change the entrypoint or patroni config
 configs:
   haproxy.cfg:
     file: haproxy.cfg
@@ -8,6 +9,7 @@ configs:
   # entrypoint.sh:
   #   file: entrypoint.sh
 
+# Uncomment volumes if you want persistence
 # volumes:
 #   dbdata1:
 #     driver: local
@@ -18,16 +20,16 @@ configs:
 
 services:
   postgres:
-    image: haproxy
+    image: haproxy:2.2.14-alpine
     configs:
     - source: haproxy.cfg
       target: /usr/local/etc/haproxy/haproxy.cfg
     ports:
-    - "5000:5000" # Postgres
-    - "7000:7000" # HAProxy stats
+    - "5001:5000" # Postgres
+    - "7001:7000" # HAProxy stats
 
   postgres1:
-    image: patroni-raft:local
+    image: spgcontrols/postgresql-patroni-raft:${VERSION:-latest}
     hostname: postgres1
     environment:
       PATRONI_RAFT_PARTNER_ADDRS: "'postgres2:2222','postgres3:2222'"
@@ -42,7 +44,7 @@ services:
     #   target: /app/data
 
   postgres2:
-    image: patroni-raft:local
+    image: spgcontrols/postgresql-patroni-raft:${VERSION:-latest}
     hostname: postgres2
     environment:
       PATRONI_RAFT_PARTNER_ADDRS: "'postgres1:2222','postgres3:2222'"
@@ -53,7 +55,7 @@ services:
     #   target: /app/data
 
   postgres3:
-    image: patroni-raft:local
+    image: spgcontrols/postgresql-patroni-raft:${VERSION:-latest}
     hostname: postgres3
     environment:
       PATRONI_RAFT_PARTNER_ADDRS: "'postgres1:2222','postgres2:2222'"
